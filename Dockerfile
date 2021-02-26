@@ -24,8 +24,8 @@ RUN git clone https://github.com/Brookluo/YSE_PZ.git
 
 WORKDIR /usr/src/yse/YSE_PZ    
 ADD requirements.txt .
-ADD YSE_PZ/settings.ini ./YSE_PZ
 RUN pip3 install -r requirements.txt
+ADD YSE_PZ/settings.ini ./YSE_PZ
 
 EXPOSE 8000
 

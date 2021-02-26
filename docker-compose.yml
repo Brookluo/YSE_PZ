@@ -1,5 +1,34 @@
 version: '3.7'
 
+# To correctly create yse_app in docker, following the steps
+# (Assuming you have the files such as settings.ini for server config 
+# and somewhere_file.sql for data)
+# 1. stop any services might take port 8000 and 3306
+# 2. in the directory where Dockerfile and compose file exists, run 
+#       sudo docker-compose build
+# 3. start the containers, run
+#       sudo docker-compose up
+#   you might see errors from yse_pz, which is expected as we connect mysql
+#   from the other container through tcp, users in mysql might not created
+#   correctly (i.e. incorrect host)
+# 4. now, go into the mysql container to setup users, run
+#       sudo docker-compose exec mysql /bin/bash
+# 5. Follow the procedure with yse_pz database, link
+#   https://yse-pz.readthedocs.io/en/latest/install.html#setting-up-the-yse-pz-database
+#   When injecting data into database, if you meet the error with utf8mb4_0900_ai_ci
+#   using the command below to replace all the occurrences of utf8mb4_0900_ai_ci 
+#   to unicode utf8mb4_unicode_ci
+#       sed -i 's/utf8mb4_0900_ai_ci/utf8mb4_unicode_ci/g' somewhere_file.sql
+#   As a side note, you can run this command outside the container, as we already
+#   mapping the data directory from outside into the container, all changes 
+#   made on the outside will be updated inside the container, vice vera.
+# 6. on a new terminal, go into the same directory where Dockerfile exists, run
+#       sudo docker-compose run yse_pz python3 manage.py migrate
+#   If you met any errors regarding some users (django or explorer) access denied, then
+#   go back to the mysql container in step 4, 5, add these users and GRANT ALL PRIVILEGES
+#   and then run the above command again
+# 7. restart the containers, and you should be all set!
+
 services: 
   yse_pz: 
     build: 
@@ -8,20 +37,25 @@ services:
     ports: 
       - "8000:8000"
     depends_on: 
-      - "mysql"
+      - mysql
     command: python3 manage.py runserver 0.0.0.0:8000
 
   mysql:
     image: mysql:5.7
     # command: 
-    #   --default-authentication-plugin=mysql_native_password
+      # --default-authentication-plugin=mysql_native_password
     # restart: always
     volumes: 
       - ./mysql_data:/var/lib/mysql
       - ../data:/data
     environment: 
-      MYSQL_ROOT_PASSWORD: 'password'
       MYSQL_DATABASE: 'YSE'
+      MYSQL_USER: 'django'
+      MYSQL_PASSWORD: '4django!'
+      MYSQL_DATABASE: 'EXPLORER'
+      MYSQL_USER: 'explorer'
+      MYSQL_PASSWORD: '4Explor3R!'
+      MYSQL_ROOT_PASSWORD: 'password'
     ports: 
       - "3306:3306"
       
