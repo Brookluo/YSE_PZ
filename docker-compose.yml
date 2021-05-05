@@ -17,11 +17,11 @@ version: '3.7'
 #   https://yse-pz.readthedocs.io/en/latest/install.html#setting-up-the-yse-pz-database
 #   When injecting data into database, if you meet the error with utf8mb4_0900_ai_ci
 #   using the command below to replace all the occurrences of utf8mb4_0900_ai_ci 
-#   to unicode utf8mb4_unicode_ci
+#   with unicode utf8mb4_unicode_ci
 #       sed -i 's/utf8mb4_0900_ai_ci/utf8mb4_unicode_ci/g' somewhere_file.sql
 #   As a side note, you can run this command outside the container, as we already
-#   mapping the data directory from outside into the container, all changes 
-#   made on the outside will be updated inside the container, vice vera.
+#   have mapped the data directory from outside into the container, all changes 
+#   made on the outside will be updated inside the container, vice versa.
 # 6. on a new terminal, go into the same directory where Dockerfile exists, run
 #       sudo docker-compose run yse_pz python3 manage.py migrate
 #   If you met any errors regarding some users (django or explorer) access denied, then
